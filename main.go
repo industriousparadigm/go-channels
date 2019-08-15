@@ -8,24 +8,34 @@ import (
 func main() {
 
 	links := []string{
-		"http://google.com",
 		"http://facebook.com",
 		"http://stackoverflow.com",
 		"http://golang.org",
+		"http://google.com",
 		"http://amazon.com",
+		"https://xenodochial-carson-4309f2.netlify.com/",
 	}
+
+	c := make(chan string)
 
 	for _, link := range links {
-		checkLink(link)
+		go checkLink(link, c)
 	}
+
+	for i := 0; i < len(links); i++ {
+		fmt.Println(<-c)
+	}
+
 }
 
-func checkLink(link string) {
+func checkLink(link string, c chan string) {
 	_, err := http.Get(link)
 	if err != nil {
 		fmt.Println(link, "might be dead.")
+		c <- "Might be down I think"
 		return
 	}
 
 	fmt.Println(link, "is up an runnin'!")
+	c <- "Yep it's up"
 }
